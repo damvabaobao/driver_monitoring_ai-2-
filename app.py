@@ -132,7 +132,7 @@ face_mesh = mp_face_mesh.FaceMesh(
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
 if not cap.isOpened():
-    print("      Camera error")
+    print("      Camera       error")
     exit()
 
 # =========================================================
