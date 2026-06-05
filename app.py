@@ -4,11 +4,12 @@ import numpy as np
 from scipy.spatial import distance
 import pygame
 import time
+import os
+import csv
 
 # =========================================================
 # CONFIG
 # =========================================================
-# 
 
 EAR_THRESHOLD = 0.25
 MAR_THRESHOLD = 0.55
@@ -41,6 +42,12 @@ yawn_counter = 0
 
 pitch_smooth = 0
 yaw_smooth = 0
+
+recording = False
+current_label = None
+sample_counter = 0
+SAVE_EVERY_N_FRAMES = 5
+
 
 last_alert_time = 0
 sound_playing = False
@@ -113,6 +120,17 @@ def get_head_pose(landmarks, w, h):
 
     return angles[0], angles[1], angles[2]
 
+def save_sample(ear, mar, pitch, yaw, label):
+    with open(DATASET_FILE, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow ([
+            round(ear, 4),
+            round(mar, 4),
+            round(pitch, 4),
+            round(yaw, 4),
+            label
+        ])
+
 
 # =========================================================
 # INIT MEDIAPIPE
@@ -133,8 +151,23 @@ face_mesh = mp_face_mesh.FaceMesh(
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
 if not cap.isOpened():
-    print("      Camera error")
+    print("      Camera       error")
     exit()
+
+# DATASET
+DATASET_FILE = "driver_dataset.csv"
+if not os.path.exists(DATASET_FILE):
+    with open(DATASET_FILE, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer = csv.writer(f)
+        writer.writerow([
+            "EAR",
+            "MAR",
+            "Pitch",
+            "Yaw",
+            "Label"
+        ])
+
 
 # =========================================================
 # LOOP
@@ -247,10 +280,46 @@ while True:
                 cv2.putText(frame, "!!! ALERT !!!", (30, 200),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
 
-    cv2.imshow("Driver Monitoring AI - Step 4", frame)
+# DATA COLLECTION
+if recording and current_label is not None:
+    sample_counter += 1
+    if sample_counter >= SAVE_EVERY_N_FRAMES:
+        save_sample(ear, mar, pitch, yaw, current_label)
+        sample_counter = 0
 
-    if cv2.waitKey(1) & 0xFF == 27:
-        break
+record_text = "NOT RECORDING"
+if recording:
+    if current_label == 0:
+        record_text = "RECORDING AWAKE"
+    elif current_label == 1:
+        record_text = "RECORDING DROWSY"
+cv2.putText( frame, record_text, (30, 380), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+cv2.putText( frame, "A=Awake D=Drowsy S=Stop", (30, 410), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+
+cv2.imshow("Driver Monitoring AI - Step 4", frame)
+
+key = cv2.waitKey(1) & 0xFF
+# Awake
+if key == ord('a'):
+    recording = True
+    current_label = 0
+
+    print("Recording AWAKE")
+# Drowsy
+elif key == ord('d'):
+    recording = True
+    current_label = 1
+
+    print("Recording DROWSY")
+# Stop
+elif key == ord('s'):
+    recording = False
+    current_label = None
+
+    print("Recording STOPPED")
+# ESC
+elif key == 27:
+    print("Exiting...")
 
 cap.release()
 cv2.destroyAllWindows()
