@@ -12,6 +12,7 @@ import time
 EAR_THRESHOLD = 0.25
 MAR_THRESHOLD = 0.55
 
+# Number
 EYE_FRAMES = 20
 YAWN_FRAMES = 15
 
