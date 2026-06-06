@@ -240,7 +240,7 @@ while True:
             if drowsy: score += 2
             if yawning: score += 1
             if head_down: score += 2
-            if distracted: score += 2
+            if distracted: score += 1
 
             if score >= 4:
                 status = "HIGH DROWSINESS"
