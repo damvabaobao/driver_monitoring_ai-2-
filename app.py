@@ -217,6 +217,7 @@ while True:
 
             pitch_smooth = pitch
             yaw_smooth = yaw
+            
 
             yaw = -yaw
 
