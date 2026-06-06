@@ -64,6 +64,8 @@ alert_sound = pygame.mixer.Sound(r"D:\driver_monitoring_ai\alarm.wav")
 # =========================================================
 
 def calculate_ear(points):
+
+    
     p1, p2, p3, p4, p5, p6 = points
     v1 = distance.euclidean(p2, p6)
     v2 = distance.euclidean(p3, p5)
