@@ -325,7 +325,8 @@ elif key == 27:
     print("Exiting...")
 
 
-    
+
+
 
 cap.release()
 cv2.destroyAllWindows()
