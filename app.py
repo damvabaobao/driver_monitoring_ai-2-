@@ -53,6 +53,8 @@ SAVE_EVERY_N_FRAMES = 5
 last_alert_time = 0
 sound_playing = False
 
+saved_samples = 0
+
 # =========================================================
 # AUDIO INIT
 # =========================================================
@@ -124,6 +126,8 @@ def get_head_pose(landmarks, w, h):
     return angles[0], angles[1], angles[2]
 
 def save_sample(ear, mar, pitch, yaw, label):
+    global saved_samples
+
     with open(DATASET_FILE, "a", newline="") as f:
         writer = csv.writer(f)
         writer.writerow ([
@@ -134,6 +138,7 @@ def save_sample(ear, mar, pitch, yaw, label):
             label
         ])
 
+    saved_samples += 1
 
 # =========================================================
 # INIT MEDIAPIPE
@@ -162,7 +167,6 @@ DATASET_FILE = "driver_dataset.csv"
 if not os.path.exists(DATASET_FILE):
     with open(DATASET_FILE, "w", newline="") as f:
         writer = csv.writer(f)
-        writer = csv.writer(f)
         writer.writerow([
             "EAR",
             "MAR",
@@ -175,8 +179,15 @@ if not os.path.exists(DATASET_FILE):
 # =========================================================
 # LOOP
 # =========================================================
+ear = 0
+mar = 0
+pitch = 0
+yaw = 0
+
 
 while True:
+
+    face_detected = False
 
     ret, frame = cap.read()
     if not ret:
@@ -191,6 +202,7 @@ while True:
     status = "AWAKE"
 
     if results.multi_face_landmarks:
+        face_detected = True
 
         for face in results.multi_face_landmarks:
 
@@ -273,58 +285,74 @@ while True:
             cv2.putText(frame, f"MAR: {mar:.2f}", (30, 80),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
             
+            cv2.putText(frame, f"Pitch: {pitch:.2f}", (30, 110),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             
-
-            cv2.putText(frame, f"Score: {score}", (30, 110),
+            cv2.putText(frame, f"Yaw: {yaw:.2f}", (30, 140),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
-            cv2.putText(frame, f"Status: {status}", (30, 140),
+            cv2.putText(frame, f"Score: {score}", (30, 170),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+
+            cv2.putText(frame, f"Status: {status}", (30, 200),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
             if status == "HIGH DROWSINESS":
-                cv2.putText(frame, "!!! ALERT !!!", (30, 200),
+                cv2.putText(frame, "!!! ALERT !!!", (30, 240),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+    # DATA COLLECTION
+    if recording and current_label is not None and face_detected:
+        sample_counter += 1
+        if sample_counter >= SAVE_EVERY_N_FRAMES:
+            save_sample(
+                ear,
+                mar,
+                pitch,
+                yaw,
+                current_label)
+            print(
+                f"Saved: EAR={ear:.2f}, "
+                f"MAR={mar:.2f}, "
+                f"PITCH={pitch:.2f},"
+                f"YAW={yaw:.2f},"
+                f"Label={current_label}"
+            )
+            sample_counter = 0
+    record_text = "NOT RECORDING"
+    if recording:
+        if current_label == 0:
+            record_text = "RECORDING AWAKE"
+        elif current_label == 1:
+            record_text = "RECORDING DROWSY"
+    cv2.putText( frame, record_text, (30, 380), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+    cv2.putText( frame, "A=Awake D=Drowsy S=Stop", (30, 410), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+    cv2.putText( frame, f"Samples: {saved_samples}", (30, 350), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    cv2.putText(frame, f"Face: {face_detected}", (30, 320), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
 
-# DATA COLLECTION
-if recording and current_label is not None:
-    sample_counter += 1
-    if sample_counter >= SAVE_EVERY_N_FRAMES:
-        save_sample(ear, mar, pitch, yaw, current_label)
-        sample_counter = 0
-# Dípal
-record_text = "NOT RECORDING"
-if recording:
-    if current_label == 0:
-        record_text = "RECORDING AWAKE"
-    elif current_label == 1:
-        record_text = "RECORDING DROWSY"
-cv2.putText( frame, record_text, (30, 380), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
-cv2.putText( frame, "A=Awake D=Drowsy S=Stop", (30, 410), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+    cv2.imshow("Driver Monitoring AI - Step 4", frame)
+    key = cv2.waitKey(1) & 0xFF
+    # Awake
+    if key == ord('a'):
+        recording = True
+        current_label = 0
 
-cv2.imshow("Driver Monitoring AI - Step 4", frame)
+        print("Recording AWAKE")
+    # Drowsy
+    elif key == ord('d'):
+        recording = True
+        current_label = 1
 
-key = cv2.waitKey(1) & 0xFF
-# Awake
-if key == ord('a'):
-    recording = True
-    current_label = 0
+        print("Recording DROWSY")
+    # Stop
+    elif key == ord('s'):
+        recording = False
+        current_label = None
 
-    print("Recording AWAKE")
-# Drowsy
-elif key == ord('d'):
-    recording = True
-    current_label = 1
-
-    print("Recording DROWSY")
-# Stop
-elif key == ord('s'):
-    recording = False
-    current_label = None
-
-    print("Recording STOPPED")
-# ESC
-elif key == 27:
-    print("Exiting...")
+        print("Recording STOPPED")
+    # ESC
+    elif key == 27:
+        print("Exiting...")
+        break
 
 cap.release()
 cv2.destroyAllWindows()
