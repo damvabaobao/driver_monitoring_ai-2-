@@ -178,6 +178,7 @@ while True:
     if not ret:
         break
 
+
     frame = cv2.flip(frame, 1)
     h, w, _ = frame.shape
 
