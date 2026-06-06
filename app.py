@@ -289,7 +289,7 @@ if recording and current_label is not None:
     if sample_counter >= SAVE_EVERY_N_FRAMES:
         save_sample(ear, mar, pitch, yaw, current_label)
         sample_counter = 0
-# Dípal
+# Display
 record_text = "NOT RECORDING"
 if recording:
     if current_label == 0:
