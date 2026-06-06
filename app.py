@@ -250,6 +250,7 @@ while True:
             elif distracted:
                 status = "DISTRACTED"
 
+
             # -------------------------
             # AUDIO ALERT
             # -------------------------
