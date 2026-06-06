@@ -270,6 +270,8 @@ while True:
 
             cv2.putText(frame, f"MAR: {mar:.2f}", (30, 80),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+            
+            
 
             cv2.putText(frame, f"Score: {score}", (30, 110),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
