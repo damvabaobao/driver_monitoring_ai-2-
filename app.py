@@ -271,7 +271,7 @@ while True:
             cv2.putText(frame, f"MAR: {mar:.2f}", (30, 80),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
             
-            
+
 
             cv2.putText(frame, f"Score: {score}", (30, 110),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
@@ -323,6 +323,9 @@ elif key == ord('s'):
 # ESC
 elif key == 27:
     print("Exiting...")
+
+
+    
 
 cap.release()
 cv2.destroyAllWindows()
