@@ -12,6 +12,7 @@ import csv
 # =========================================================
 
 EAR_THRESHOLD = 0.25
+
 MAR_THRESHOLD = 0.55
 
 # Number
