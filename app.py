@@ -28,6 +28,8 @@ ALPHA = 0.25
 
 ALERT_COOLDOWN = 3  # seconds
 
+DROWSY_THRESHOLD = 0.56
+
 # =========================================================
 # LANDMARKS
 # =========================================================
@@ -293,7 +295,7 @@ while True:
             else:
                 status = "DROWSY:Buon ngu"
             
-            if probability[1] > 0.80:
+            if probability[1] > DROWSY_THRESHOLD:
                 if time.time() - last_alert_time > ALERT_COOLDOWN:
                     alert_sound.play()
                     last_alert_time = time.time()
@@ -301,7 +303,7 @@ while True:
             else:
                 sound_playing = False
             
-            if probability[1] > 0.80:
+            if probability[1] > DROWSY_THRESHOLD:
                 color = (0, 0, 255) # Red
             elif probability[1] > 0.5:
                 color = (0, 255, 255) # Yellow
