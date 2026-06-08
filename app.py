@@ -101,6 +101,7 @@ def get_head_pose(landmarks, w, h):
     focal = w
     center = (w / 2, h / 2)
 
+
     camera_matrix = np.array([
         [focal, 0, center[0]],
         [0, focal, center[1]],
@@ -119,7 +120,7 @@ def get_head_pose(landmarks, w, h):
 
     return angles[0], angles[1], angles[2]
 
-def save_sample(ear, mar, pitch, yaw, label):
+def  save_sample(ear, mar, pitch, yaw, label):
     with open(DATASET_FILE, "a", newline="") as f:
         writer = csv.writer(f)
         writer.writerow ([
