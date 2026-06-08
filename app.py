@@ -6,6 +6,8 @@ import pygame
 import time
 import os
 import csv
+import joblib
+import pandas as pd
 
 # =========================================================
 # CONFIG
@@ -61,6 +63,9 @@ saved_samples = 0
 
 pygame.mixer.init()
 alert_sound = pygame.mixer.Sound(r"D:\driver_monitoring_ai\alarm.wav")
+
+model = joblib.load("driver_drowsiness_rf.pkl")
+print("AI model loaded!!!!!")
 
 # =========================================================
 # FUNCTIONS
@@ -159,7 +164,7 @@ face_mesh = mp_face_mesh.FaceMesh(
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
 if not cap.isOpened():
-    print("      Camera       error")
+    print("Camera error")
     exit()
 
 # DATASET
@@ -175,7 +180,6 @@ if not os.path.exists(DATASET_FILE):
             "Label"
         ])
 
-
 # =========================================================
 # LOOP
 # =========================================================
@@ -183,7 +187,6 @@ ear = 0
 mar = 0
 pitch = 0
 yaw = 0
-
 
 while True:
 
@@ -235,6 +238,15 @@ while True:
 
             yaw = -yaw
 
+            sample = pd.DataFrame([[
+                ear,
+                mar,
+                pitch,
+                yaw
+            ]], columns = ["EAR", "MAR", "Pitch", "Yaw"])
+            prediction = model.predict(sample)[0]
+            probability = model.predict_proba(sample)[0]
+
             # -------------------------
             # LOGIC
             # -------------------------
@@ -250,31 +262,51 @@ while True:
             # -------------------------
             # FUSION SCORE
             # -------------------------
-            score = 0
-            if drowsy: score += 2
-            if yawning: score += 1
-            if head_down: score += 2
-            if distracted: score += 1
+            # score = 0
+            # if drowsy: score += 2
+            # if yawning: score += 1
+            # if head_down: score += 2
+            # if distracted: score += 1
 
-            if score >= 4:
-                status = "HIGH DROWSINESS"
-            elif score >= 2:
-                status = "DROWSY"
-            elif yawning:
-                status = "YAWNING"
-            elif distracted:
-                status = "DISTRACTED"
+            # if score >= 4:
+            #     status = "HIGH DROWSINESS"
+            # elif score >= 2:
+            #     status = "DROWSY"
+            # elif yawning:
+            #     status = "YAWNING"
+            # elif distracted:
+            #     status = "DISTRACTED"
 
-            # -------------------------
-            # AUDIO ALERT
-            # -------------------------
-            if score >= 4:
+            # # -------------------------
+            # # AUDIO ALERT
+            # # -------------------------
+            # if score >= 4:
+            #     if time.time() - last_alert_time > ALERT_COOLDOWN:
+            #         alert_sound.play()
+            #         last_alert_time = time.time()
+            #         sound_playing = True
+            # else:
+            #     sound_playing = False
+
+            if prediction == 0:
+                status = "AWAKE:Tinh"
+            else:
+                status = "DROWSY:Buon ngu"
+            
+            if probability[1] > 0.80:
                 if time.time() - last_alert_time > ALERT_COOLDOWN:
                     alert_sound.play()
                     last_alert_time = time.time()
                     sound_playing = True
             else:
                 sound_playing = False
+            
+            if probability[1] > 0.80:
+                color = (0, 0, 255) # Red
+            elif probability[1] > 0.5:
+                color = (0, 255, 255) # Yellow
+            else:
+                color = (0, 255, 0) # Green
 
             # -------------------------
             # DISPLAY
@@ -291,12 +323,17 @@ while True:
             cv2.putText(frame, f"Yaw: {yaw:.2f}", (30, 140),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
-            cv2.putText(frame, f"Score: {score}", (30, 170),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+            # cv2.putText(frame, f"Score: {score}", (30, 170),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
             cv2.putText(frame, f"Status: {status}", (30, 200),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
-
+            
+            cv2.putText(frame, f"Drowsy Probability: {probability[1]*100:.1f}%", (30, 230),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+            
+            cv2.putText(frame, f"Drowsy Prob: {probability[1]*100:.1f}%", (30, 170),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
             if status == "HIGH DROWSINESS":
                 cv2.putText(frame, "!!! ALERT !!!", (30, 240),
                             cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
