@@ -236,7 +236,7 @@ while True:
             # -------------------------
             # FUSION SCORE
             # -------------------------
-            score = 0
+            screo = 0
             if drowsy: score += 2
             if yawning: score += 1
             if head_down: score += 2
