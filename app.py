@@ -18,7 +18,7 @@ EAR_THRESHOLD = 0.25
 MAR_THRESHOLD = 0.55
 
 # Number
-EYE_FRAMES = 20
+EYE_FRAMES = 90
 YAWN_FRAMES = 15
 
 HEAD_DOWN_THRESHOLD = 12
@@ -296,7 +296,7 @@ while True:
             else:
                 status = "DROWSY:Buon ngu"
             
-            if probability[1] > DROWSY_THRESHOLD:
+            if probability[1] > DROWSY_THRESHOLD and drowsy:
                 if time.time() - last_alert_time > ALERT_COOLDOWN:
                     alert_sound.play()
                     last_alert_time = time.time()
