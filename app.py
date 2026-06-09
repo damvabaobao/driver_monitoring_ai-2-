@@ -120,16 +120,7 @@ def get_head_pose(landmarks, w, h):
 
     return angles[0], angles[1], angles[2]
 
-def  save_sample(ear, mar, pitch, yaw, label):
-    with open(DATASET_FILE, "a", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow ([
-            round(ear, 4),
-            round(mar, 4),
-            round(pitch, 4),
-            round(yaw, 4),
-            label
-        ])
+def save sample(aer, mar, pitch, yaw, label):)
 
 
 # =========================================================
