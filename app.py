@@ -64,7 +64,7 @@ saved_samples = 0
 # =========================================================
 
 pygame.mixer.init()
-alert_sound = pygame.mixer.Sound(r"C:\Users\LEGION\Documents\GitHub\driver_monitoring_ai-2-\alarm.wav")
+alert_sound = pygame.mixer.Sound(r"D:\driver_monitoring_ai\alarm.wav")
 
 model = joblib.load("driver_drowsiness_rf.pkl")
 #model = joblib.load("driver_drowsiness_xgb.pkl")
