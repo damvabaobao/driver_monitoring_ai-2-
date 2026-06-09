@@ -18,7 +18,7 @@ EAR_THRESHOLD = 0.25
 MAR_THRESHOLD = 0.55
 
 # Number
-EYE_FRAMES = 20
+EYE_FRAMES = 90
 YAWN_FRAMES = 15
 
 HEAD_DOWN_THRESHOLD = 12
@@ -28,7 +28,7 @@ ALPHA = 0.25
 
 ALERT_COOLDOWN = 3  # seconds
 
-DROWSY_THRESHOLD = 0.56
+DROWSY_THRESHOLD = 0.65
 
 # =========================================================
 # LANDMARKS
@@ -64,9 +64,10 @@ saved_samples = 0
 # =========================================================
 
 pygame.mixer.init()
-alert_sound = pygame.mixer.Sound(r"D:\driver_monitoring_ai\alarm.wav")
+alert_sound = pygame.mixer.Sound(r"C:\Users\LEGION\Documents\GitHub\driver_monitoring_ai-2-\alarm.wav")
 
 model = joblib.load("driver_drowsiness_rf.pkl")
+#model = joblib.load("driver_drowsiness_xgb.pkl")
 print("AI model loaded!!!!!")
 
 # =========================================================

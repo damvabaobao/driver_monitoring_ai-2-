@@ -111,6 +111,13 @@ plt.ylabel("True Positive Rate")
 plt.title("ROC Curve")
 plt.show()
 
+plt.figure(figsize=(6, 4))
+plt.bar(importance_df["Feature"],
+        importance_df["Importance"])
+plt.title("Feature Importance")
+plt.ylabel("Importance")
+plt.show()
+
 # Save
 joblib.dump(grid_search.best_estimator_, "driver_drowsiness_rf.pkl")
 print("\nModel saved!!!!!!!")
