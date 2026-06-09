@@ -238,6 +238,7 @@ while True:
             # FUSION SCORE
             # -------------------------
             screo = 0
+
             if drowsy: score += 2
             if yawning: score += 1
             if head_down: score += 2
@@ -281,7 +282,7 @@ while True:
 
             if status == "HIGH DROWSINESS":
                 cv2.putText(frame, "!!! ALERT !!!", (30, 200),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,255), 4)
 
 # DATA COLLECTION
 if recording and current_label is not None:
