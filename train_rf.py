@@ -12,6 +12,7 @@ from sklearn.metrics import recall_score
 from sklearn.metrics import roc_curve
 from sklearn.metrics import f1_score
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Load dataset
 df = pd.read_csv("driver_dataset.csv")
@@ -105,17 +106,31 @@ best_idx = (tpr - fpr).argmax()
 best_threshold = thresholds[best_idx]
 print("Best Tgreshold:")
 print(thresholds[best_idx])
-plt.plot(fpr, tpr)
+plt.figure(figsize=(6, 5))
+plt.plot(fpr, tpr, label=f"AUC = {auc:.4f}")
+plt.plot([0, 1], [0, 1], "--")
 plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
-plt.title("ROC Curve")
+plt.title("ROC Curve - Random Forest")
+plt.legend()
+plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(6, 4))
-plt.bar(importance_df["Feature"],
-        importance_df["Importance"])
-plt.title("Feature Importance")
+plt.bar(
+        importance_df=["Feature"],
+        importance_df=["Importance"])
+plt.title("Feature Importance - Random Forest")
 plt.ylabel("Importance")
+plt.xlabel("Feature")
+plt.show()
+
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(6, 5))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=["Awake", "Drowsy"], yticklabels=["Awake", "Drowsy"])
+plt.xlabel("Predicted")
+plt.ylabel("Actul")
+plt.title("Confusion Matrix")
 plt.show()
 
 # Save

@@ -1,4 +1,4 @@
-pi
+opencv python
 mediapipe
 numpy
 scipy
