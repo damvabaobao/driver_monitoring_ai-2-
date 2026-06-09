@@ -28,7 +28,7 @@ ALPHA = 0.25
 
 ALERT_COOLDOWN = 3  # seconds
 
-DROWSY_THRESHOLD = 0.56
+DROWSY_THRESHOLD = 0.65
 
 # =========================================================
 # LANDMARKS
