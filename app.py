@@ -296,7 +296,7 @@ while True:
             else:
                 status = "DROWSY:Buon ngu"
             
-            if probability[1] > DROWSY_THRESHOLD and drowsy:
+            if probability[1] > DROWSY_THRESHOLD:
                 if time.time() - last_alert_time > ALERT_COOLDOWN:
                     alert_sound.play()
                     last_alert_time = time.time()
