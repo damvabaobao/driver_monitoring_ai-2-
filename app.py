@@ -75,17 +75,17 @@ model = joblib.load("driver_drowsiness_xgb.pkl")
 print("AI model loaded!!!!!")
 
 # FUNCTIONS
-
 def calculate_ear(points):
-
-    
     p1, p2, p3, p4, p5, p6 = points
-    v1 = distance.euclidean(p2, p6)
-    v2 = distance.euclidean(p3, p5)
-    h = distance.euclidean(p1, p4)
-    if h == 0:
+
+    vertical_a = distance.euclidean(p2, p6)
+    vertical_b = distance.euclidean(p3, p5)
+    horizontal = distance.euclidean(p1, p4)
+
+    if horizontal == 0:
         return 0
-    return (v1 + v2) / (2.0 * h)
+
+    return (vertical_a + vertical_b) / (2.0 * horizontal)
 
 
 def calculate_mar(points):
@@ -103,8 +103,7 @@ def get_head_pose(landmarks, w, h):
     image_points = np.array([
         (landmarks[1].x * w, landmarks[1].y * h),
         (landmarks[33].x * w, landmarks[33].y * h),
-        (landmarks[263].x * w, landmarks[263].y * h),
-        
+        (landmarks[263].x * w, landmarks[263].y * h),    
         (landmarks[61].x * w, landmarks[61].y * h),
         (landmarks[291].x * w, landmarks[291].y * h),
         (landmarks[199].x * w, landmarks[199].y * h)
