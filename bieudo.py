@@ -86,34 +86,81 @@ plt.show()
 
 
 # =====================================================================
-# BIỂU ĐỒ 6 (MỚI): Jointplot kết hợp phân phối giữa EAR và MAR
+# BIỂU ĐỒ 6: Jointplot kết hợp phân phối giữa EAR và MAR
 # =====================================================================
-# Biểu đồ này vừa thể hiện mối quan hệ phân tán (scatter) giữa EAR và MAR,
-# vừa hiển thị biểu đồ phân phối biên (marginal histogram) ở hai cạnh.
 g = sns.jointplot(data=df, x="EAR", y="MAR", hue="Label", palette="plasma", alpha=0.6, height=7)
 g.fig.suptitle("Joint Distribution of EAR and MAR", y=1.02)
 plt.show()
 
 
 # =====================================================================
-# BIỂU ĐỒ 7 (MỚI): Lmplot xu hướng tương quan tuyến tính giữa Pitch và Yaw
+# BIỂU ĐỒ 7: Lmplot xu hướng tương quan tuyến tính giữa Pitch và Yaw
 # =====================================================================
-# Biểu đồ hiển thị các điểm dữ liệu kèm theo đường hồi quy tuyến tính (regression line) 
-# để xem xu hướng chuyển động của đầu có khác biệt rõ rệt giữa 2 trạng thái không.
 sns.lmplot(data=df, x="Pitch", y="Yaw", hue="Label", palette="vlag", height=6, aspect=1.2, scatter_kws={'alpha':0.5})
 plt.title("Linear Regression Trend: Pitch vs Yaw")
 plt.show()
 
 
 # =====================================================================
-# BIỂU ĐỒ 8 (MỚI): Strip Plot hiển thị mật độ điểm chi tiết cho EAR
+# BIỂU ĐỒ 8: Strip Plot hiển thị mật độ điểm chi tiết cho EAR
 # =====================================================================
-# Kết hợp biểu đồ Violin (mật độ hình học) với Strip plot (vẽ từng chấm dữ liệu thực tế)
-# Giúp bạn nhìn rõ mật độ tập trung dữ liệu chính xác và phát hiện các điểm dị biệt nhiễu.
 plt.figure(figsize=(8, 6))
 sns.violinplot(data=df, x="Label", y="EAR", inner=None, color="lightgray")
 sns.stripplot(data=df, x="Label", y="EAR", hue="Label", palette="Set1", alpha=0.5, jitter=0.25)
 plt.title("Detailed Data Points Distribution for EAR")
 plt.xlabel("Driver State (0: Awake, 1: Drowsy)")
 plt.ylabel("EAR Value")
+plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 9 (MỚI): Biểu đồ phân phối tích lũy (ECDF Plot) cho EAR
+# =====================================================================
+# Thể hiện tỷ lệ phần trăm tích lũy của dữ liệu. Giúp xác định chính xác 
+# giá trị EAR mà tại đó phần lớn tài xế bắt đầu rơi vào trạng thái ngủ gật.
+plt.figure(figsize=(8, 5))
+sns.ecdfplot(data=df, x="EAR", hue="Label", palette="bright", linewidth=2)
+plt.title("Empirical Cumulative Distribution Function (ECDF) of EAR")
+plt.xlabel("EAR Value")
+plt.ylabel("Proportion")
+plt.grid(True, linestyle="--", alpha=0.6)
+plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 10 (MỚI): Biểu đồ phân phối mật độ hai chiều (2D KDE Plot)
+# =====================================================================
+# Thể hiện vùng mật độ tập trung cao nhất dưới dạng các đường đồng mức (contour lines).
+# Rất tốt để chỉ ra ranh giới tách biệt không gian trạng thái giữa EAR và MAR.
+plt.figure(figsize=(8, 6))
+sns.kdeplot(data=df, x="EAR", y="MAR", hue="Label", fill=False, thresh=0.1, levels=10, palette="viridis", alpha=0.8)
+plt.title("2D Contour Density: EAR vs MAR")
+plt.xlabel("EAR (Eye Aspect Ratio)")
+plt.ylabel("MAR (Mouth Aspect Ratio)")
+plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 11 (MỚI): Biểu đồ phân đoạn dữ liệu (Histogram theo dạng Stacked)
+# =====================================================================
+# Chia nhỏ các khoảng giá trị của MAR thành từng cột chồng, giúp nhìn thấy rõ 
+# số lượng mẫu ngáp (MAR lớn) chiếm ưu thế như thế nào ở nhãn Drowsy (1).
+plt.figure(figsize=(8, 5))
+sns.histplot(data=df, x="MAR", hue="Label", multiple="stack", palette="tab10", bins=30, edgecolor="white")
+plt.title("Stacked Histogram of Mouth Aspect Ratio (MAR)")
+plt.xlabel("MAR Value")
+plt.ylabel("Count")
+plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 12 (MỚI): Swarm Plot cho góc Pitch để phát hiện biên dữ liệu
+# =====================================================================
+# Gần giống Strip Plot nhưng sắp xếp các điểm không bị chồng lên nhau, 
+# phác họa rõ nét hình dáng mật độ phân bố góc gật đầu (Pitch) của tài xế.
+plt.figure(figsize=(8, 6))
+sns.swarmplot(data=df, x="Label", y="Pitch", hue="Label", palette="cubehelix", size=4, alpha=0.7)
+plt.title("Swarm Plot Distribution for Head Pitch")
+plt.xlabel("Driver State (0: Awake, 1: Drowsy)")
+plt.ylabel("Pitch (Degrees)")
 plt.show()
