@@ -100,16 +100,12 @@ def calculate_mar(points):
 
 
 def get_head_pose(landmarks, w, h):
+    indices = [1, 33, 263, 61, 291, 199]
 
-    image_points = np.array([
-        (landmarks[1].x * w, landmarks[1].y * h),
-        (landmarks[33].x * w, landmarks[33].y * h),
-        (landmarks[263].x * w, landmarks[263].y * h),    
-        (landmarks[61].x * w, landmarks[61].y * h),
-        (landmarks[291].x * w, landmarks[291].y * h),
-        (landmarks[199].x * w, landmarks[199].y * h)
-    ], dtype="double")
-
+    image_points = np.array(
+        [(landmarks[i].x * w, landmarks[i].y * h) for i in indices],
+        dtype="double"
+    )
     model_points = np.array([
         (0.0, 0.0, 0.0),
         (-30.0, -30.0, -30.0),
