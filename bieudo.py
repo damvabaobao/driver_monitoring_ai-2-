@@ -43,3 +43,15 @@ plt.figure(figsize=(8, 6))
 sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
 plt.title("Feature Correlation Matrix")
 plt.show()
+plt.figure(figsize=(6, 4))
+
+sns.countplot(
+    data=df,
+    x="Label"
+)
+
+plt.title("Class Distribution")
+plt.xlabel("Label")
+plt.ylabel("Number of Samples")
+
+plt.show()
