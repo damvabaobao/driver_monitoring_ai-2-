@@ -14,8 +14,18 @@ x_pca = pca.fit_transform(x)
 
 plt.figure(figsize=(8, 6))
 
-plt.scatter(x_pca[y==0,0], x_pca[y==0,1], label="Awake", alpha=0.5)
-plt.scatter(x_pca[y==1,0], x_pca[y==1,1], label="Drowsy", alpha=0.5)
+plt.scatter(
+    X_pca[y==0,0],
+    X_pca[y==0,1],
+    label="Awake",
+    alpha=0.6
+)
+plt.scatter(
+    X_pca[y==1,0],
+    X_pca[y==1,1],
+    label="Drowsy",
+    alpha=0.6
+)
 
 plt.legend()
 plt.title("PCA Visualization")
