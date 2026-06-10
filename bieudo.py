@@ -55,3 +55,14 @@ plt.xlabel("Label")
 plt.ylabel("Number of Samples")
 
 plt.show()
+plt.figure(figsize=(7,5))
+
+sns.barplot(
+    data=importance,
+    x="Importance",
+    y="Feature"
+)
+
+plt.title("Feature Importance")
+plt.tight_layout()
+plt.show()
