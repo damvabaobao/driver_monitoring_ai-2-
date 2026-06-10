@@ -98,4 +98,22 @@ plt.show()
 # =====================================================================
 # BIỂU ĐỒ 7 (MỚI): Lmplot xu hướng tương quan tuyến tính giữa Pitch và Yaw
 # =====================================================================
-# Biểu đồ
+# Biểu đồ hiển thị các điểm dữ liệu kèm theo đường hồi quy tuyến tính (regression line) 
+# để xem xu hướng chuyển động của đầu có khác biệt rõ rệt giữa 2 trạng thái không.
+sns.lmplot(data=df, x="Pitch", y="Yaw", hue="Label", palette="vlag", height=6, aspect=1.2, scatter_kws={'alpha':0.5})
+plt.title("Linear Regression Trend: Pitch vs Yaw")
+plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 8 (MỚI): Strip Plot hiển thị mật độ điểm chi tiết cho EAR
+# =====================================================================
+# Kết hợp biểu đồ Violin (mật độ hình học) với Strip plot (vẽ từng chấm dữ liệu thực tế)
+# Giúp bạn nhìn rõ mật độ tập trung dữ liệu chính xác và phát hiện các điểm dị biệt nhiễu.
+plt.figure(figsize=(8, 6))
+sns.violinplot(data=df, x="Label", y="EAR", inner=None, color="lightgray")
+sns.stripplot(data=df, x="Label", y="EAR", hue="Label", palette="Set1", alpha=0.5, jitter=0.25)
+plt.title("Detailed Data Points Distribution for EAR")
+plt.xlabel("Driver State (0: Awake, 1: Drowsy)")
+plt.ylabel("EAR Value")
+plt.show()
