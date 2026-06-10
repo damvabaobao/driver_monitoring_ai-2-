@@ -85,8 +85,11 @@ def calculate_ear(points):
     if horizontal == 0:
         return 0
 
-    return (vertical_a + vertical_b) / (2.0 * horizontal)
 
+
+
+
+    return (vertical_a + vertical_b) / (2.0 * horizontal)
 
 def calculate_mar(points):
     p1, p2, p3, p4, p5, p6, p7, p8 = points
@@ -96,6 +99,8 @@ def calculate_mar(points):
     if h == 0:
         return 0
     return (v1 + v2) / (2.0 * h)
+
+
 
 
 def get_head_pose(landmarks, w, h):
