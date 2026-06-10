@@ -1,4 +1,4 @@
-opencv python
+opencv-python
 mediapipe
 numpy
 scipy
@@ -7,3 +7,5 @@ pandas
 scikit-learn
 joblib
 matplotlib
+seaborn
+xgboost
