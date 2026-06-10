@@ -52,13 +52,11 @@ plt.show()
 # =====================================================================
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-# Vẽ Boxplot cho EAR (Tỉ lệ mở mắt)
 sns.boxplot(data=df, x='Label', y='EAR', ax=axes[0], palette='Set2')
 axes[0].set_title('Distribution of Eye Aspect Ratio (EAR)')
 axes[0].set_xlabel('Driver State (0: Awake, 1: Drowsy)')
 axes[0].set_ylabel('EAR Value')
 
-# Vẽ Boxplot cho MAR (Tỉ lệ mở miệng)
 sns.boxplot(data=df, x='Label', y='MAR', ax=axes[1], palette='Set2')
 axes[1].set_title('Distribution of Mouth Aspect Ratio (MAR)')
 axes[1].set_xlabel('Driver State (0: Awake, 1: Drowsy)')
@@ -73,13 +71,11 @@ plt.show()
 # =====================================================================
 fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-# Vẽ đường cong mật độ cho Pitch (Gật đầu)
 sns.kdeplot(data=df, x='Pitch', hue='Label', fill=True, ax=axes[0], palette='Dark2', common_norm=False, alpha=0.5)
 axes[0].set_title('Head Pitch Density Distribution')
 axes[0].set_xlabel('Pitch (Degrees)')
 axes[0].set_ylabel('Density')
 
-# Vẽ đường cong mật độ cho Yaw (Quay đầu)
 sns.kdeplot(data=df, x='Yaw', hue='Label', fill=True, ax=axes[1], palette='Dark2', common_norm=False, alpha=0.5)
 axes[1].set_title('Head Yaw Density Distribution')
 axes[1].set_xlabel('Yaw (Degrees)')
@@ -87,3 +83,19 @@ axes[1].set_ylabel('Density')
 
 plt.tight_layout()
 plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 6 (MỚI): Jointplot kết hợp phân phối giữa EAR và MAR
+# =====================================================================
+# Biểu đồ này vừa thể hiện mối quan hệ phân tán (scatter) giữa EAR và MAR,
+# vừa hiển thị biểu đồ phân phối biên (marginal histogram) ở hai cạnh.
+g = sns.jointplot(data=df, x="EAR", y="MAR", hue="Label", palette="plasma", alpha=0.6, height=7)
+g.fig.suptitle("Joint Distribution of EAR and MAR", y=1.02)
+plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 7 (MỚI): Lmplot xu hướng tương quan tuyến tính giữa Pitch và Yaw
+# =====================================================================
+# Biểu đồ
