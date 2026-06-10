@@ -2,127 +2,88 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-from mpl_toolkits.mplot3d import Axes3D
 
-# =========================
-# 1. LOAD DATA
-# =========================
+# 1. Đọc dữ liệu từ file CSV
 df = pd.read_csv("driver_dataset.csv")
 
-features = ["EAR", "MAR", "Pitch", "Yaw"]
-x = df[features]
+# Tách đặc trưng (x) và nhãn trạng thái (y)
+x = df[["EAR", "MAR", "Pitch", "Yaw"]]
 y = df["Label"]
 
-# =========================
-# 2. PCA (2D VISUALIZATION)
-# =========================
+# 2. Giảm chiều dữ liệu bằng PCA (xuống 2 chiều để vẽ đồ thị)
 pca = PCA(n_components=2)
 x_pca = pca.fit_transform(x)
 
+
+# =====================================================================
+# BIỂU ĐỒ 1: Trực quan hóa dữ liệu sau khi giảm chiều bằng PCA
+# =====================================================================
 plt.figure(figsize=(8, 6))
-plt.scatter(x_pca[y == 0, 0], x_pca[y == 0, 1], label="Awake", alpha=0.6)
-plt.scatter(x_pca[y == 1, 0], x_pca[y == 1, 1], label="Drowsy", alpha=0.6)
+
+plt.scatter(x_pca[y==0, 0], x_pca[y==0, 1], label="Awake", alpha=0.5, color='teal')
+plt.scatter(x_pca[y==1, 0], x_pca[y==1, 1], label="Drowsy", alpha=0.5, color='crimson')
+
 plt.legend()
-plt.title("PCA Visualization of Driver State")
+plt.title("PCA Visualization")
 plt.xlabel("Principal Component 1")
 plt.ylabel("Principal Component 2")
 plt.grid(True)
 plt.show()
 
-# =========================
-# 3. HISTOGRAM + KDE
-# =========================
-for f in features:
-    plt.figure(figsize=(7, 5))
-    sns.histplot(df, x=f, hue="Label", kde=True, bins=30)
-    plt.title(f"Distribution of {f} by Label")
-    plt.xlabel(f)
-    plt.ylabel("Count")
-    plt.grid(True)
-    plt.show()
 
-# =========================
-# 4. BOXPLOT
-# =========================
-for f in features:
-    plt.figure(figsize=(6, 4))
-    sns.boxplot(x="Label", y=f, data=df)
-    plt.title(f"{f} Comparison Between Awake and Drowsy")
-    plt.xlabel("Label (0 = Awake, 1 = Drowsy)")
-    plt.ylabel(f)
-    plt.grid(True)
-    plt.show()
-
-# =========================
-# 5. VIOLIN PLOT
-# =========================
-for f in features:
-    plt.figure(figsize=(6, 4))
-    sns.violinplot(x="Label", y=f, data=df, inner="quartile")
-    plt.title(f"Violin Plot of {f}")
-    plt.xlabel("Label")
-    plt.ylabel(f)
-    plt.show()
-
-# =========================
-# 6. SCATTER: EAR vs MAR
-# =========================
-plt.figure(figsize=(7, 6))
-sns.scatterplot(
-    data=df,
-    x="EAR",
-    y="MAR",
-    hue="Label",
-    alpha=0.6
-)
-plt.title("EAR vs MAR Scatter Plot")
-plt.grid(True)
+# =====================================================================
+# BIỂU ĐỒ 2: Pairplot - Biểu đồ ma trận các cặp thuộc tính
+# =====================================================================
+sns.pairplot(df, vars=["EAR", "MAR", "Pitch", "Yaw"], hue="Label", palette="Set1")
 plt.show()
 
-# =========================
-# 7. 3D SCATTER (EAR - MAR - PITCH)
-# =========================
-fig = plt.figure(figsize=(8, 6))
-ax = fig.add_subplot(111, projection="3d")
 
-scatter = ax.scatter(
-    df["EAR"],
-    df["MAR"],
-    df["Pitch"],
-    c=df["Label"],
-    cmap="coolwarm",
-    alpha=0.6
-)
-
-ax.set_xlabel("EAR")
-ax.set_ylabel("MAR")
-ax.set_zlabel("Pitch")
-ax.set_title("3D Scatter: EAR - MAR - Pitch")
-plt.show()
-
-# =========================
-# 8. PCA EXPLAINED VARIANCE
-# =========================
-plt.figure(figsize=(6, 4))
-plt.bar(
-    range(1, len(pca.explained_variance_ratio_) + 1),
-    pca.explained_variance_ratio_
-)
-plt.xlabel("Principal Components")
-plt.ylabel("Explained Variance Ratio")
-plt.title("PCA Explained Variance")
-plt.grid(True)
-plt.show()
-
-# =========================
-# 9. CORRELATION HEATMAP
-# =========================
+# =====================================================================
+# BIỂU ĐỒ 3: Ma trận tương quan giữa các đặc trưng (Heatmap)
+# =====================================================================
 plt.figure(figsize=(8, 6))
-sns.heatmap(
-    df.corr(numeric_only=True),
-    annot=True,
-    cmap="coolwarm"
-)
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", fmt=".2f")
 plt.title("Feature Correlation Matrix")
+plt.show()
 
+
+# =====================================================================
+# BIỂU ĐỒ 4: Biểu đồ hộp (Boxplot) so sánh phân phối EAR và MAR
+# =====================================================================
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Vẽ Boxplot cho EAR (Tỉ lệ mở mắt)
+sns.boxplot(data=df, x='Label', y='EAR', ax=axes[0], palette='Set2')
+axes[0].set_title('Distribution of Eye Aspect Ratio (EAR)')
+axes[0].set_xlabel('Driver State (0: Awake, 1: Drowsy)')
+axes[0].set_ylabel('EAR Value')
+
+# Vẽ Boxplot cho MAR (Tỉ lệ mở miệng)
+sns.boxplot(data=df, x='Label', y='MAR', ax=axes[1], palette='Set2')
+axes[1].set_title('Distribution of Mouth Aspect Ratio (MAR)')
+axes[1].set_xlabel('Driver State (0: Awake, 1: Drowsy)')
+axes[1].set_ylabel('MAR Value')
+
+plt.tight_layout()
+plt.show()
+
+
+# =====================================================================
+# BIỂU ĐỒ 5: Biểu đồ mật độ (KDE Plot) cho tư thế đầu Pitch và Yaw
+# =====================================================================
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# Vẽ đường cong mật độ cho Pitch (Gật đầu)
+sns.kdeplot(data=df, x='Pitch', hue='Label', fill=True, ax=axes[0], palette='Dark2', common_norm=False, alpha=0.5)
+axes[0].set_title('Head Pitch Density Distribution')
+axes[0].set_xlabel('Pitch (Degrees)')
+axes[0].set_ylabel('Density')
+
+# Vẽ đường cong mật độ cho Yaw (Quay đầu)
+sns.kdeplot(data=df, x='Yaw', hue='Label', fill=True, ax=axes[1], palette='Dark2', common_norm=False, alpha=0.5)
+axes[1].set_title('Head Yaw Density Distribution')
+axes[1].set_xlabel('Yaw (Degrees)')
+axes[1].set_ylabel('Density')
+
+plt.tight_layout()
 plt.show()
