@@ -26,7 +26,7 @@ ALPHA = 0.25
 
 ALERT_COOLDOWN = 3  # seconds
 
-DROWSY_THRESHOLD = 0.65
+DROWSY_THRESHOLD = 0.75
 
 # LANDMARKS
 
@@ -53,13 +53,25 @@ sound_playing = False
 
 saved_samples = 0
 
+drowsy_counter = 0
+DROWSY_CONFIRM_FRAMES = 30
+
+face_lost_start = None
+FACE_LOST_TIME = 3
+
+probability = ([1.0, 0.0])
+confirmed_drowsy = False
+
+color = (0, 255, 0)
+prob_smooth = 0
+
 # AUDIO INIT
 
 pygame.mixer.init()
 alert_sound = pygame.mixer.Sound(r"D:\driver_monitoring_ai\alarm.wav")
 
-model = joblib.load("driver_drowsiness_rf.pkl")
-#model = joblib.load("driver_drowsiness_xgb.pkl")
+#model = joblib.load("driver_drowsiness_rf.pkl")
+model = joblib.load("driver_drowsiness_xgb.pkl")
 print("AI model loaded!!!!!")
 
 # FUNCTIONS
@@ -71,6 +83,8 @@ def calculate_ear(points):
     v1 = distance.euclidean(p2, p6)
     v2 = distance.euclidean(p3, p5)
     h = distance.euclidean(p1, p4)
+    if h == 0:
+        return 0
     return (v1 + v2) / (2.0 * h)
 
 
@@ -79,6 +93,8 @@ def calculate_mar(points):
     v1 = distance.euclidean(p3, p6)
     v2 = distance.euclidean(p4, p5)
     h = distance.euclidean(p1, p2)
+    if h == 0:
+        return 0
     return (v1 + v2) / (2.0 * h)
 
 
@@ -194,6 +210,7 @@ while True:
 
     if results.multi_face_landmarks:
         face_detected = True
+        face_lost_start = None
 
         for face in results.multi_face_landmarks:
 
@@ -231,6 +248,8 @@ while True:
             prediction = model.predict(sample)[0]
             probability = model.predict_proba(sample)[0]
 
+            prob_smooth = 0.8 * prob_smooth + 0.2 * probability[1]
+
             # LOGIC
             
             eye_counter = eye_counter + 1 if ear < EAR_THRESHOLD else 0
@@ -247,45 +266,70 @@ while True:
             else:
                 status = "DROWSY:Buon ngu"
             
-            if probability[1] > DROWSY_THRESHOLD:
+            if prob_smooth > DROWSY_THRESHOLD:
+                drowsy_counter += 1
+            else:
+                drowsy_counter = 0
+            confirmed_drowsy = (
+                drowsy_counter >= DROWSY_CONFIRM_FRAMES
+            )
+            if confirmed_drowsy:
                 if time.time() - last_alert_time > ALERT_COOLDOWN:
                     alert_sound.play()
                     last_alert_time = time.time()
-                    sound_playing = True
-            else:
-                sound_playing = False
             
-            if probability[1] > DROWSY_THRESHOLD:
+            if prob_smooth > DROWSY_THRESHOLD:
                 color = (0, 0, 255) # Red
-            elif probability[1] > 0.5:
+            elif prob_smooth > 0.5:
                 color = (0, 255, 255) # Yellow
             else:
                 color = (0, 255, 0) # Green
+    else:
+        prob_smooth = 0
+        drowsy_counter = 0
+        confirmed_drowsy = False
+        if face_lost_start is None:
+            face_lost_start = time.time()
+        lost_duration = time.time() - face_lost_start
+        if lost_duration >= FACE_LOST_TIME:
+            cv2.putText(
+                frame,
+                "FACE NOT DETECTED!",
+                (30, 270),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 0, 255),
+                2
+            )
+            if time.time() - last_alert_time > ALERT_COOLDOWN:
+                alert_sound.play()
+                last_alert_time = time.time()
+        cv2.putText(frame, f"Face Lost: {lost_duration:.1f}s", (20, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255),2)
 
-            # DISPLAY
-            cv2.putText(frame, f"EAR: {ear:.2f}", (30, 50),
+    # DISPLAY
+    cv2.putText(frame, f"EAR: {ear:.2f}", (30, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
-            cv2.putText(frame, f"MAR: {mar:.2f}", (30, 80),
+    cv2.putText(frame, f"MAR: {mar:.2f}", (30, 80),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
             
-            cv2.putText(frame, f"Pitch: {pitch:.2f}", (30, 110),
+    cv2.putText(frame, f"Pitch: {pitch:.2f}", (30, 110),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             
-            cv2.putText(frame, f"Yaw: {yaw:.2f}", (30, 140),
+    cv2.putText(frame, f"Yaw: {yaw:.2f}", (30, 140),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
-            cv2.putText(frame, f"Status: {status}", (30, 200),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
             
-            cv2.putText(frame, f"Drowsy Probability: {probability[1]*100:.1f}%", (30, 230),
+    cv2.putText(frame, f"Drowsy Probability: {prob_smooth*100:.1f}%", (30, 230),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
             
-            cv2.putText(frame, f"Drowsy Prob: {probability[1]*100:.1f}%", (30, 170),
+    cv2.putText(frame, f"Drowsy Prob: {prob_smooth*100:.1f}%", (30, 170),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
-            if status == "HIGH DROWSINESS":
-                cv2.putText(frame, "!!! ALERT !!!", (30, 240),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+    if confirmed_drowsy:
+        status = "HIGH DROWSINESS"
+        cv2.putText(frame, "!!!ALERT!!!", (30, 260), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+    cv2.putText(frame, f"Status: {status}", (30, 200),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
     # DATA COLLECTION
     if recording and current_label is not None and face_detected:
         sample_counter += 1
