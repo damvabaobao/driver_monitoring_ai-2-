@@ -9,9 +9,7 @@ import csv
 import joblib
 import pandas as pd
 
-# =========================================================
 # CONFIG
-# =========================================================
 
 EAR_THRESHOLD = 0.25
 
@@ -30,17 +28,13 @@ ALERT_COOLDOWN = 3  # seconds
 
 DROWSY_THRESHOLD = 0.65
 
-# =========================================================
 # LANDMARKS
-# =========================================================
 
 LEFT_EYE = [33, 160, 158, 133, 153, 144]
 RIGHT_EYE = [362, 385, 387, 263, 373, 380]
 MOUTH = [61, 291, 39, 181, 0, 17, 269, 405]
 
-# =========================================================
 # STATE
-# =========================================================
 
 eye_counter = 0
 yawn_counter = 0
@@ -59,9 +53,7 @@ sound_playing = False
 
 saved_samples = 0
 
-# =========================================================
 # AUDIO INIT
-# =========================================================
 
 pygame.mixer.init()
 alert_sound = pygame.mixer.Sound(r"D:\driver_monitoring_ai\alarm.wav")
@@ -70,9 +62,7 @@ model = joblib.load("driver_drowsiness_rf.pkl")
 #model = joblib.load("driver_drowsiness_xgb.pkl")
 print("AI model loaded!!!!!")
 
-# =========================================================
 # FUNCTIONS
-# =========================================================
 
 def calculate_ear(points):
 
@@ -148,9 +138,7 @@ def save_sample(ear, mar, pitch, yaw, label):
 
     saved_samples += 1
 
-# =========================================================
 # INIT MEDIAPIPE
-# =========================================================
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(
@@ -160,9 +148,7 @@ face_mesh = mp_face_mesh.FaceMesh(
     min_tracking_confidence=0.5
 )
 
-# =========================================================
 # CAMERA
-# =========================================================
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
@@ -183,9 +169,8 @@ if not os.path.exists(DATASET_FILE):
             "Label"
         ])
 
-# =========================================================
 # LOOP
-# =========================================================
+
 ear = 0
 mar = 0
 pitch = 0
@@ -214,23 +199,19 @@ while True:
 
             lm = face.landmark
 
-            # -------------------------
             # EYE
-            # -------------------------
+
             left = [(int(lm[i].x * w), int(lm[i].y * h)) for i in LEFT_EYE]
             right = [(int(lm[i].x * w), int(lm[i].y * h)) for i in RIGHT_EYE]
 
             ear = (calculate_ear(left) + calculate_ear(right)) / 2
 
-            # -------------------------
             # MOUTH
-            # -------------------------
+            
             mouth = [(int(lm[i].x * w), int(lm[i].y * h)) for i in MOUTH]
             mar = calculate_mar(mouth)
 
-            # -------------------------
             # HEAD POSE
-            # -------------------------
             pitch, yaw, roll = get_head_pose(lm, w, h)
 
             pitch = pitch * (1 - ALPHA) + pitch_smooth * ALPHA
@@ -250,9 +231,8 @@ while True:
             prediction = model.predict(sample)[0]
             probability = model.predict_proba(sample)[0]
 
-            # -------------------------
             # LOGIC
-            # -------------------------
+            
             eye_counter = eye_counter + 1 if ear < EAR_THRESHOLD else 0
             yawn_counter = yawn_counter + 1 if mar > MAR_THRESHOLD else 0
 
@@ -261,35 +241,6 @@ while True:
 
             head_down = pitch > HEAD_DOWN_THRESHOLD
             distracted = abs(yaw) > HEAD_SIDE_THRESHOLD
-
-            # -------------------------
-            # FUSION SCORE
-            # -------------------------
-            # score = 0
-            # if drowsy: score += 2
-            # if yawning: score += 1
-            # if head_down: score += 2
-            # if distracted: score += 1
-
-            # if score >= 4:
-            #     status = "HIGH DROWSINESS"
-            # elif score >= 2:
-            #     status = "DROWSY"
-            # elif yawning:
-            #     status = "YAWNING"
-            # elif distracted:
-            #     status = "DISTRACTED"
-
-            # # -------------------------
-            # # AUDIO ALERT
-            # # -------------------------
-            # if score >= 4:
-            #     if time.time() - last_alert_time > ALERT_COOLDOWN:
-            #         alert_sound.play()
-            #         last_alert_time = time.time()
-            #         sound_playing = True
-            # else:
-            #     sound_playing = False
 
             if prediction == 0:
                 status = "AWAKE:Tinh"
@@ -311,9 +262,7 @@ while True:
             else:
                 color = (0, 255, 0) # Green
 
-            # -------------------------
             # DISPLAY
-            # -------------------------
             cv2.putText(frame, f"EAR: {ear:.2f}", (30, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
@@ -325,9 +274,6 @@ while True:
             
             cv2.putText(frame, f"Yaw: {yaw:.2f}", (30, 140),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-
-            # cv2.putText(frame, f"Score: {score}", (30, 170),
-            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
 
             cv2.putText(frame, f"Status: {status}", (30, 200),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)

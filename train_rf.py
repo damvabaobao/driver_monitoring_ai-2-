@@ -117,12 +117,11 @@ plt.grid(True)
 plt.show()
 
 plt.figure(figsize=(6, 4))
-plt.bar(
-        importance_df=["Feature"],
-        importance_df=["Importance"])
+sns.barplot(
+        data=importance_df,
+        x="Feature",
+        y="Importance")
 plt.title("Feature Importance - Random Forest")
-plt.ylabel("Importance")
-plt.xlabel("Feature")
 plt.show()
 
 cm = confusion_matrix(y_test, y_pred)

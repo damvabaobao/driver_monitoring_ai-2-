@@ -19,6 +19,7 @@ from sklearn.metrics import (
 import matplotlib.pyplot as plt
 
 from xgboost import XGBClassifier
+import seaborn as sns
 
 # LOAD
 
@@ -75,20 +76,41 @@ importance_df = importance_df.sort_values(
 )
 print("\nFeature Importance:")
 print(importance_df)
+plt.figure(figsize=(6,4))
+plt.bar(
+        importance_df["Feature"],
+        importance_df["Importance"]
+)
+plt.title("Feature Importance - XGBoost")
+plt.xlabel("Feature")
+plt.ylabel("Importance")
 print("\nClassification Report:")
 print(classification_report(y_test, y_pred))
 print("\nConfusion Matrix:")
 print(confusion_matrix(y_test, y_pred))
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(6, 5))
+sns.heatmap(
+        cm, annot=True, fmt="d", cmap="Blues",
+        xticklabels=["Awake", "Drowsy"],
+        yticklabels=["Awake", "Drowsy"]
+)
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix - XGBoost")
+plt.show()
 print("Best Parameters:")
 print(grid.best_params_)
 
 # ROC CURVE
 fpr, tpr, _ = roc_curve(y_test, y_prob)
 plt.figure(figsize=(6, 6))
-plt.plot(fpr, tpr)
+plt.plot(fpr, tpr, label=f"AUC={auc:.4f}")
+plt.plot([0, 1], [0, 1], "--")
 plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
 plt.title("ROC Curve - XGBoost")
+plt.legend()
 plt.grid(True)
 plt.show()
 
