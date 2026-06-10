@@ -85,10 +85,6 @@ def calculate_ear(points):
     if horizontal == 0:
         return 0
 
-
-
-
-
     return (vertical_a + vertical_b) / (2.0 * horizontal)
 
 def calculate_mar(points):
