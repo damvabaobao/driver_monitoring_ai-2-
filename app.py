@@ -70,8 +70,7 @@ prob_smooth = 0
 pygame.mixer.init()
 alert_sound = pygame.mixer.Sound(r"D:\driver_monitoring_ai\alarm.wav")
 
-#model = joblib.load("driver_drowsiness_rf.pkl")
-model = joblib.load("driver_drowsiness_xgb.pkl")
+model = joblib.load("driver_drowsiness_xgb.pkl")  # driver_drowsiness_rf.pkl
 print("AI model loaded!!!!!")
 
 # FUNCTIONS
