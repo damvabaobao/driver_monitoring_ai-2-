@@ -71,15 +71,10 @@ print("AI model loaded!!!!!")
 # FUNCTIONS
 def calculate_ear(points):
     p1, p2, p3, p4, p5, p6 = points
-
     vertical_a = distance.euclidean(p2, p6)
     vertical_b = distance.euclidean(p3, p5)
     horizontal = distance.euclidean(p1, p4)
-
-    if horizontal == 0:
-        return 0
-
-    return (vertical_a + vertical_b) / (2.0 * horizontal)
+    return 0 if horizontal == 0 else (vertical_a + vertical_b) / (2.0 * horizontal)
 
 def calculate_mar(points):
     p1, p2, p3, p4, p5, p6, p7, p8 = points
