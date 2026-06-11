@@ -298,17 +298,15 @@ while True:
         cv2.putText(frame, f"Face Lost: {lost_duration:.1f}s", (20, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255),2)
 
     # DISPLAY
-    cv2.putText(frame, f"EAR: {ear:.2f}", (30, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+    metrics = [
+    (f"EAR: {ear:.2f}",   50,  (0, 255, 0)),
+    (f"MAR: {mar:.2f}",   80,  (255, 0, 0)),
+    (f"Pitch: {pitch:.2f}", 110, (0, 255, 255)),
+    (f"Yaw: {yaw:.2f}",   140, (0, 255, 255)),
+]
 
-    cv2.putText(frame, f"MAR: {mar:.2f}", (30, 80),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
-            
-    cv2.putText(frame, f"Pitch: {pitch:.2f}", (30, 110),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-            
-    cv2.putText(frame, f"Yaw: {yaw:.2f}", (30, 140),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+for text, y, color in metrics:
+    cv2.putText(frame, text, (30, y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
             
     cv2.putText(frame, f"Drowsy Probability: {prob_smooth*100:.1f}%", (30, 230),
