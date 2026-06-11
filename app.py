@@ -199,9 +199,9 @@ while True:
 
     status = "AWAKE"
 
-    if results.multi_face_landmarks:
-        face_detected = True
-        face_lost_start = None
+if results.multi_face_landmarks:
+    face_detected = True
+    face_lost_start = None
 
         for face in results.multi_face_landmarks:
 
