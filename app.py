@@ -174,13 +174,7 @@ DATASET_FILE = "driver_dataset.csv"
 if not os.path.exists(DATASET_FILE):
     with open(DATASET_FILE, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow([
-            "EAR",
-            "MAR",
-            "Pitch",
-            "Yaw",
-            "Label"
-        ])
+        writer.writerow(["EAR", "MAR", "Pitch", "Yaw", "Label"])
 
 # LOOP
 
