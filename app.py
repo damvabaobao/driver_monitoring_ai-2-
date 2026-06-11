@@ -81,9 +81,7 @@ def calculate_mar(points):
     v1 = distance.euclidean(p3, p6)
     v2 = distance.euclidean(p4, p5)
     h = distance.euclidean(p1, p2)
-    if h == 0:
-        return 0
-    return (v1 + v2) / (2.0 * h)
+    return 0 if h == 0 else (v1 + v2) / (2.0 * h)
 
 
 
